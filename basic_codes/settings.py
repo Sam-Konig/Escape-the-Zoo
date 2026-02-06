@@ -1,0 +1,8 @@
+window_width = 1280
+window_height = 720
+world_width = 2560
+world_height = 1080
+window_centerx = window_width//2
+world_centerx = world_width//2
+window_centery = window_height//2
+world_centery = world_height//2

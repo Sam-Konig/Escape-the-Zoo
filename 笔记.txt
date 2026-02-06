@@ -1,0 +1,4 @@
+pygame.display.set_mode((1280, 720), pygame.FULLSCREEN)  # 创建全屏窗口
+
+pygame.display.set_mode((1280, 720), pygame.RESIZABLE)  # 窗口可拖动调整大小
+
