@@ -6,3 +6,5 @@ window_centerx = window_width//2
 world_centerx = world_width//2
 window_centery = window_height//2
 world_centery = world_height//2
+playerStandardSize_x = 108
+playerStandardSize_y = 129

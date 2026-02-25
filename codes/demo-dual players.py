@@ -1,7 +1,10 @@
 import pygame
+import math
 import gameUI
 import text_button
 import player
+import playerbigger
+from basic_codes import settings as st
 
 pygame.init()
 pygame.font.init()
@@ -11,14 +14,16 @@ clock = pygame.time.Clock()
 FPS = 60
 window_open = True
 motion_count = 0
-window_width = 1280
-window_height = 720
-world_width = 2560
-world_height = 1080
-window_centerx = window_width//2
-world_centerx = world_width//2
-window_centery = window_height//2
-world_centery = world_height//2
+window_width = st.window_width
+window_height = st.window_height
+world_width = st.world_width
+world_height = st.world_height
+window_centerx = st.window_centerx
+window_centery = st.window_centery
+world_centerx = st.world_centerx
+world_centery = st.world_centery
+min_zoom = 0.8
+max_zoom = 1.0
 
 game_window = pygame.display.set_mode((window_width,window_height))
 pygame.display.set_caption("事件发射器")
@@ -47,31 +52,61 @@ class Camera:
     def __init__(self):
         self.x = 0
         self.y = 0
-        self.dead_zone = 100
-    
-    def update(self, player1_x, player1_y, player2_x, player2_y):
-        anchor_x = (player1_x + player2_x) // 2
-        anchor_y = (player1_y + player2_y) // 2
-        ideal_centerx = window_centerx
-        target_centerx = anchor_x - world_centerx + window_centerx - self.x
-        screen_offset_x = target_centerx - ideal_centerx
-        if screen_offset_x > self.dead_zone:
-            camera_target_x = anchor_x - (world_centerx-window_centerx) - (ideal_centerx + self.dead_zone)
-        elif screen_offset_x < - self.dead_zone:
-            camera_target_x = anchor_x - (world_centerx-window_centerx) - (ideal_centerx - self.dead_zone)
-        else:
-            camera_target_x = self.x
+        self.zoom = 1.0
+        self.deadzone = 50
 
-        self.x += (camera_target_x - self.x) * 0.05
-        max_camera_x = world_centerx - window_centerx
-        min_camera_x = window_centerx - world_centerx
-        max_camera_y = world_centery - window_centery
-        min_camera_y = window_centery - world_centery
-        self.x = max(min_camera_x, min(self.x, max_camera_x))
+    def update(self, player1, player2):
+        player1Left = player1.getPosition('left')
+        player2Left = player2.getPosition('left')
+        player1Right = player1.getPosition('right')
+        player2Right = player2.getPosition('right')
+        player1CenterX = player1.getPosition('centerx')
+        player2CenterX = player2.getPosition('centerx')
+        player1CenterY = player1.getPosition('centery')
+        player2CenterY = player2.getPosition('centery')
 
+        screenLeft = world_centerx - window_centerx + camera.x
+        screenRight = world_centerx - window_centerx + camera.x + window_width
+        playerLeft = min(player1Left,player2Left)
+        playerRight = max(player1Right,player2Right)
+
+        anchor_x = (player1CenterX + player2CenterX) // 2
+        anchor_y = (player1CenterY + player2CenterY) // 2
+
+        camera_target_x = anchor_x - world_centerx
         camera_target_y = anchor_y - world_centery
-        self.y += camera_target_y - self.y
-        self.y = max(min_camera_y, min(self.y, max_camera_y))
+
+        offset_x = camera_target_x - self.x
+
+        if offset_x > self.deadzone:
+            target_x = camera_target_x - self.deadzone
+        elif offset_x < - self.deadzone:
+            target_x = camera_target_x + self.deadzone
+        else:
+            target_x = self.x
+        
+        target_y = camera_target_y
+        
+        if not playerLeft < screenLeft + offset_x and not playerRight > screenRight + offset_x:
+
+    # 每帧更新，factor 通常 0.05~0.15
+            self.x += (target_x - self.x) * 0.1
+            self.y += (target_y - self.y) * 0.1
+            # self.zoom += (zoom - self.zoom) * 0.05
+
+            max_camera_x = world_centerx - window_centerx
+            min_camera_x = window_centerx - world_centerx
+            self.x = max(min_camera_x, min(self.x, max_camera_x))
+
+def screenCheck(player, camera):
+    screenLeft = world_centerx - window_centerx + camera.x
+    screenRight = world_centerx - window_centerx + camera.x + window_width
+    playerLeft = player.getPosition('left')
+    playerRight = player.getPosition('right')
+    if playerLeft < screenLeft:
+        player.setPosition('left',screenLeft)
+    elif playerRight > screenRight:
+        player.setPosition('right',screenRight)
 
 bt_player1_up = text_button.TextButton("↑",250,545,50,50)
 bt_player1_down = text_button.TextButton("↓",250,605,50,50)
@@ -106,19 +141,10 @@ BG6 = Background('./img/bg/bush.png',width=8000)
 UI = gameUI.UI()
 
 player1 = player.Player()
-player1.getImages('running')
-player1.image_rect.center = (world_centerx - window_centerx + player1.size[0]//2 + 100, world_centery)
-player1.rect_bottom = player1.image_rect.bottom
-player1.screenX = player1.image_rect.centerx - world_centerx + window_centerx - player1.size[0]//2
-player1.screenY = player1.image_rect.centery - world_centery + window_centery - player1.size[1]//2
+player1.init(world_centerx - window_centerx, world_centery)
 
-player2 = player.Player()
-player2.facingRight = False
-player2.getImages('running')
-player2.image_rect.center = (world_centerx + window_centerx - player2.size[0]//2 - 100, world_centery)
-player2.rect_bottom = player2.image_rect.bottom
-player2.screenX = player2.image_rect.centerx - world_centerx + window_centerx - player2.size[0]//2
-player2.screenY = player2.image_rect.centery - world_centery + window_centery - player2.size[1]//2
+player2 = playerbigger.Player()
+player2.init(world_centerx + window_centerx, world_centery, False)
 
 camera = Camera()
 
@@ -214,12 +240,14 @@ while window_open:
             if not player2.isJumping:
                 player2.isMoving = False  
 
-    # camera.update(player1.image_rect.centerx,player1.image_rect.centery)
-    camera.update(player1.image_rect.centerx,player1.image_rect.centery,player2.image_rect.centerx,player2.image_rect.centery)
     if player1.isMoving:
         player1.update(player2)
+        screenCheck(player1,camera)
+
     if player2.isMoving:
         player2.update(player1)
+        screenCheck(player2,camera)
+    camera.update(player1,player2)
 
     bt_player1_up.update()
     bt_player1_down.update()

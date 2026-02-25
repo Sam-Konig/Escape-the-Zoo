@@ -1,7 +1,4 @@
-import sys
-# 如果用sys.path.append('..')，检索目录放最后，用insert则先检索上一级目录
-sys.path.insert(0, '..')
-from basic_codes import settings as st
+import settings as st
 
 class Camera:
     def __init__(self):
