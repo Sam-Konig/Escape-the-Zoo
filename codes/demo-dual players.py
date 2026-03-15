@@ -1,5 +1,4 @@
 import pygame
-import math
 import gameUI
 import text_button
 import player
@@ -171,20 +170,18 @@ while window_open:
             if not player1.isJumping:
                 if player1.facingRight:
                     player1.facingRight = False
-                    player1.isMoving = True
+                player1.isMoving = True
+                if not player1.action == 'running':
                     bottomLeft = player1.image_rect.bottomleft
                     player1.getImages('running')
                     player1.image_rect.bottomleft = bottomLeft
-                else:
-                    player1.isMoving = True
 
         if player1_right == 'pressed':
             if not player1.isJumping:
-                if player1.facingRight:
-                    player1.isMoving = True
-                else:
+                if not player1.facingRight:
                     player1.facingRight = True
-                    player1.isMoving = True
+                player1.isMoving = True
+                if not player1.action == 'running':
                     bottomLeft = player1.image_rect.bottomleft
                     player1.getImages('running')
                     player1.image_rect.bottomleft = bottomLeft
@@ -214,20 +211,18 @@ while window_open:
             if not player2.isJumping:
                 if player2.facingRight:
                     player2.facingRight = False
-                    player2.isMoving = True
+                player2.isMoving = True
+                if not player2.action == 'running':
                     bottomLeft = player2.image_rect.bottomleft
                     player2.getImages('running')
                     player2.image_rect.bottomleft = bottomLeft
-                else:
-                    player2.isMoving = True
 
         if player2_right == 'pressed':
             if not player2.isJumping:
-                if player2.facingRight:
-                    player2.isMoving = True
-                else:
+                if not player2.facingRight:
                     player2.facingRight = True
-                    player2.isMoving = True
+                player2.isMoving = True
+                if not player2.action == 'running':
                     bottomLeft = player2.image_rect.bottomleft
                     player2.getImages('running')
                     player2.image_rect.bottomleft = bottomLeft

@@ -31,6 +31,7 @@ class Player:
         self.facingRight = True
         self.bodyMargin_x = 0
         self.bodyMargin_y = 0
+        self.action = None
 
         self.data = {
             'running':{
@@ -67,6 +68,7 @@ class Player:
         self.bodyMargin_y = (self.size[1] - st.playerStandardSize_y) // 2
 
     def getImages(self,action):
+        self.action = action
         self.path = self.data[action]['PATH']
         self.frame_num = self.data[action]['FRAME_NUM']
         self.speed = self.data[action]['SPEED']
@@ -128,7 +130,7 @@ class Player:
             dy = self.speed[self.image_index][1]
             self.image_rect.centerx += dx
             # if other_player is not None:
-            #     if abs(self.image_rect.centerx - other_player.image_rect.centerx) + self.size[0] + other_player.size[0] > st.window_width:
+            #     if abs(self.image_rect.centerx - other_player.image_rect.centerx) + self.size[0] // 2 + other_player.size[0] // 2 > st.window_width:
             #         self.image_rect.centerx -= dx
             self.image_rect.centerx = max(self.size[0] // 2, min(self.image_rect.centerx, st.world_width - self.size[0] // 2)) 
             self.image_rect.centery += dy

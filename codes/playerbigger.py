@@ -31,6 +31,7 @@ class Player:
         self.facingRight = True
         self.bodyMargin_x = 0
         self.bodyMargin_y = 0
+        self.action = None
 
         self.data = {
             'running':{
@@ -67,6 +68,7 @@ class Player:
         self.bodyMargin_y = (self.size[1] - st.playerStandardSize_y) // 2
 
     def getImages(self,action):
+        self.action = action
         self.path = self.data[action]['PATH']
         self.frame_num = self.data[action]['FRAME_NUM']
         self.speed = self.data[action]['SPEED']
